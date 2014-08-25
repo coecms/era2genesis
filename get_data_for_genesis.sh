@@ -22,7 +22,6 @@ module load netcdf nco cdo
 PATH_TO_ERA_FILES="/g/data1/ua8/erai/netcdf/oper_an_pl/fullres/sub-daily/${year}"
 WORK_DIR="/short/${PROJECT}/${USER}/scm/data2"
 
-echo "Step 1: Extract data from ERA files"
 
 UFILE="${WORK_DIR}/${file_prefix}_u.nc"
 VFILE="${WORK_DIR}/${file_prefix}_v.nc"
@@ -30,7 +29,7 @@ ZFILE="${WORK_DIR}/${file_prefix}_ht.nc"
 QFILE="${WORK_DIR}/${file_prefix}_q.nc"
 MSPFILE="${WORK_DIR}/${file_prefix}_msp.nc"
 
-#3DFILES="${UFILE} ${VFILE} ${ZFILE} ${QFILE}"
+FILES3D="${UFILE} ${VFILE} ${ZFILE} ${QFILE}"
 
 for field in U V Q Z ; do
   echo "${field}... "
@@ -61,30 +60,47 @@ for field in U V Q Z ; do
       LATNAME="g0_lat_2"
       LONNAME="g0_lon_3"
       TIMENAME="initial_time0_hours"
+      DIM="3D"
       ;;
     "MSP")
       LATNAME="g0_lat_1"
       LONNAME="g0_lon_2"
       TIMENAME="initial_time0_hours"
+      DIM="2D"
       ;;
   esac
 
-  echo ncks -d ${LATNAME},${LATRANGE} -d ${LONNAME},${LONRANGE} -d ${TIMENAME},${TIMERANGE} ${INFILE} ${OUTFILE}
+  echo "Step 1: Extract data from ERA files"
   ncks -d ${LATNAME},${LATRANGE} -d ${LONNAME},${LONRANGE} -d ${TIMENAME},${TIMERANGE} ${INFILE} ${OUTFILE}
   RC=$?
   if [[ "$RC" != "0" ]]; then
     echo "Something went wrong. Exiting"
     exit 1
   fi
-  echo ncrename -O -d ${LATNAME},latitude -v ${LATNAME},latitude -d ${LONNAME},longitude -v ${LONNAME},longitude 
-  echo             -d ${TIMENAME},t -v ${TIMENAME},t ${OUTFILE} ${OUTFILE}
-  ncrename -O -d ${LATNAME},latitude -v ${LATNAME},latitude -d ${LONNAME},longitude -v ${LONNAME},longitude \
-              -d ${TIMENAME},t -v ${TIMENAME},t ${OUTFILE} ${OUTFILE}
+
+
+  echo "Step 2: renaming dimensions."
+  DIMRENAMES="-d ${LATNAME},latitude -d ${LONNAME},longitude -d ${TIMENAME},t"
+  if [[ "$DIM" == "3D" ]]; then
+    # Adding height dimension to rename list
+    DIMRENAMES="${DIMRENAMES} -d lv_ISBL1,p"
+  fi
+  VARRENAMES="${DIMRENAMES//-d/-v}"
+  ncrename -O ${DIMRENAMES} ${VARRENAMES} ${OUTFILE} ${OUTFILE}
   RC=$?
   if [[ "$RC" != "0" ]]; then
     echo "Something went wrong. Exiting"
     exit 1
   fi
+
+  echo "Step 3: inverting some dimesions"
+  ncpdq -O -a -latitude ${OUTFILE} ${OUTFILE}
+  if [[ "$DIM" == "3D" ]]; then
+    ncpdq -O -a -p ${OUTFILE} ${OUTFILE}
+  fi
+
+
+
   echo "done"
 done
 
