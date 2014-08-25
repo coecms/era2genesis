@@ -32,7 +32,7 @@ MSPFILE="${WORK_DIR}/${file_prefix}_msp.nc"
 
 #3DFILES="${UFILE} ${VFILE} ${ZFILE} ${QFILE}"
 
-for field in U V Q Z MSP ; do
+for field in U V Q Z ; do
   echo "${field}... "
   INFILE="${PATH_TO_ERA_FILES}/${field}_6hrs_pl_${year}_${month}.nc"
   case ${field} in
@@ -71,6 +71,15 @@ for field in U V Q Z MSP ; do
 
   echo ncks -d ${LATNAME},${LATRANGE} -d ${LONNAME},${LONRANGE} -d ${TIMENAME},${TIMERANGE} ${INFILE} ${OUTFILE}
   ncks -d ${LATNAME},${LATRANGE} -d ${LONNAME},${LONRANGE} -d ${TIMENAME},${TIMERANGE} ${INFILE} ${OUTFILE}
+  RC=$?
+  if [[ "$RC" != "0" ]]; then
+    echo "Something went wrong. Exiting"
+    exit 1
+  fi
+  echo ncrename -O -d ${LATNAME},latitude -v ${LATNAME},latitude -d ${LONNAME},longitude -v ${LONNAME},longitude 
+  echo             -d ${TIMENAME},t -v ${TIMENAME},t ${OUTFILE} ${OUTFILE}
+  ncrename -O -d ${LATNAME},latitude -v ${LATNAME},latitude -d ${LONNAME},longitude -v ${LONNAME},longitude \
+              -d ${TIMENAME},t -v ${TIMENAME},t ${OUTFILE} ${OUTFILE}
   RC=$?
   if [[ "$RC" != "0" ]]; then
     echo "Something went wrong. Exiting"
