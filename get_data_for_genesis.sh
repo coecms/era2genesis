@@ -101,7 +101,7 @@ for field in U V T Q Z ; do
     # Adding height dimension to rename list
     DIMRENAMES="${DIMRENAMES} -d lv_ISBL1,pint"
   fi
-  VARRENAMES="${DIMRENAMES//-d/-v} -v ${INVARNAME},${VARNAME}"
+  VARRENAMES="${DIMRENAMES//-d/-v} -v ${INVARNAME},${VARNAME}short"
   ncrename -O ${DIMRENAMES} ${VARRENAMES} ${OUTFILE} ${OUTFILE}
   RC=$?
   if [[ "$RC" != "0" ]]; then
@@ -128,6 +128,36 @@ for field in U V T Q Z ; do
   echo "Step 4: Change time dimension"
   DAYS_DIFFERENCE=`calc_difference.py -o 1800-01-01 -n ${year}-${month}-01`
   ncap2 -O -s "t=float((t/24.)-${DAYS_DIFFERENCE})" -s "t@units=\"days since ${year}-${month}-01 00:00\"" ${OUTFILE} ${OUTFILE}
+  RC=$?
+  if [[ "$RC" != "0" ]]; then
+    echo "Something went wrong. Exiting"
+    exit 1
+  fi
+
+  echo "Step 5: Convert everything to float"
+  ncap2 -O -s "${VARNAME}=float(${VARNAME}short)" ${OUTFILE} ${OUTFILE}
+  RC=$?
+  if [[ "$RC" != "0" ]]; then
+    echo "Something went wrong. Exiting"
+    exit 1
+  fi
+  if [[ "$DIM" == "3D" ]]; then
+    ncap2 -O -s "p=float(pint)" ${OUTFILE} ${OUTFILE}
+    RC=$?
+    if [[ "$RC" != "0" ]]; then
+      echo "Something went wrong while converting pressure levels for ${field}. Exiting"
+      exit 1
+    fi
+    ncrename -O -d pint,p ${OUTFILE} ${OUTFILE}
+  fi
+
+  echo "Step 6: removing superfluous fields"
+
+  VARS_TO_DELETE="-v ${VARNAME}short,initial_time0,initial_time0_encoded"
+  if [[ "$DIM" == "3D" ]] ; then
+    VARS_TO_DELETE="${VARS_TO_DELETE},pint"
+  fi
+  ncks -O -x ${VARS_TO_DELETE} ${OUTFILE} ${OUTFILE}
   RC=$?
   if [[ "$RC" != "0" ]]; then
     echo "Something went wrong. Exiting"
