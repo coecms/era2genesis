@@ -8,7 +8,7 @@ file_prefix="holger"
 
 # Area around the relevant column
 # NOTE: Always use floating points. Otherwise it will not work.
-# will be used in ncrcat -d ...,${LATRANGE}
+# will be used in ncks -d ...,${LATRANGE}
 LATRANGE="-37.5,-34.5"
 LONRANGE="146.25,150.0"
 
@@ -69,8 +69,8 @@ for field in U V Q Z MSP ; do
       ;;
   esac
 
-  echo ncrcat -d ${LATNAME},${LATRANGE} -d ${LONNAME},${LONRANGE} ${INFILE} ${OUTFILE}
-  ncrcat -d ${LATNAME},${LATRANGE} -d ${LONNAME},${LONRANGE} ${INFILE} ${OUTFILE}
+  echo ncks -d ${LATNAME},${LATRANGE} -d ${LONNAME},${LONRANGE} -d ${TIMENAME},${TIMERANGE} ${INFILE} ${OUTFILE}
+  ncks -d ${LATNAME},${LATRANGE} -d ${LONNAME},${LONRANGE} -d ${TIMENAME},${TIMERANGE} ${INFILE} ${OUTFILE}
   RC=$?
   if [[ "$RC" != "0" ]]; then
     echo "Something went wrong. Exiting"
