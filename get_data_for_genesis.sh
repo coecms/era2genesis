@@ -25,30 +25,46 @@ WORK_DIR="/short/${PROJECT}/${USER}/scm/data2"
 
 UFILE="${WORK_DIR}/${file_prefix}_u.nc"
 VFILE="${WORK_DIR}/${file_prefix}_v.nc"
+TFILE="${WORK_DIR}/${file_prefix}_temp.nc"
 ZFILE="${WORK_DIR}/${file_prefix}_ht.nc"
 QFILE="${WORK_DIR}/${file_prefix}_q.nc"
 MSPFILE="${WORK_DIR}/${file_prefix}_msp.nc"
 
 FILES3D="${UFILE} ${VFILE} ${ZFILE} ${QFILE}"
 
-for field in U V Q Z ; do
+for field in U V T Q Z ; do
   echo "${field}... "
   INFILE="${PATH_TO_ERA_FILES}/${field}_6hrs_pl_${year}_${month}.nc"
   case ${field} in
     "U")
       OUTFILE=${UFILE}
+      INVARNAME="U_GDS0_ISBL"
+      VARNAME="u"
       ;;
     "V")
       OUTFILE=${VFILE}
+      INVARNAME="V_GDS0_ISBL"
+      VARNAME="v"
+      ;;
+    "T")
+      OUTFILE=${TFILE}
+      INVARNAME="T_GDS0_ISBL"
+      VARNAME="temp"
       ;;
     "Z")
       OUTFILE=${ZFILE}
+      INVARNAME="Z_GDS0_ISBL"
+      VARNAME="ht"
       ;;
     "Q")
       OUTFILE=${QFILE}
+      INVARNAME="Q_GDS0_ISBL"
+      VARNAME="q"
       ;;
     "MSP")
       OUTFILE=${MSPFILE}
+      INVARNAME="MSL_GDS0_SFC"
+      VARNAME="p"
       ;;
     *)
       echo "field not found. exiting"
@@ -56,7 +72,7 @@ for field in U V Q Z ; do
       ;;
   esac
   case ${field} in 
-    "U"|"V"|"Z"|"Q")
+    "U"|"V"|"T"|"Z"|"Q")
       LATNAME="g0_lat_2"
       LONNAME="g0_lon_3"
       TIMENAME="initial_time0_hours"
