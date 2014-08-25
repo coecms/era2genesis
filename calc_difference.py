@@ -22,8 +22,8 @@ def main():
   parser.add_option('-n', '--new', help='New date')
   (opts, args) = parser.parse_args()
 
-  old_time = datetime.strptime(opts.original, '%Y-%m-%d %H:%M')
-  new_time = datetime.strptime(opts.new, '%Y-%m-%d %H:%M')
+  old_time = datetime.strptime(opts.original, '%Y-%m-%d')
+  new_time = datetime.strptime(opts.new, '%Y-%m-%d')
   print calc_difference(old_time, new_time)
 
 if __name__ == '__main__':
