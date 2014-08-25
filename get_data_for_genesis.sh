@@ -99,7 +99,7 @@ for field in U V T Q Z ; do
   DIMRENAMES="-d ${LATNAME},latitude -d ${LONNAME},longitude -d ${TIMENAME},t"
   if [[ "$DIM" == "3D" ]]; then
     # Adding height dimension to rename list
-    DIMRENAMES="${DIMRENAMES} -d lv_ISBL1,p"
+    DIMRENAMES="${DIMRENAMES} -d lv_ISBL1,pint"
   fi
   VARRENAMES="${DIMRENAMES//-d/-v} -v ${INVARNAME},${VARNAME}"
   ncrename -O ${DIMRENAMES} ${VARRENAMES} ${OUTFILE} ${OUTFILE}
@@ -111,10 +111,28 @@ for field in U V T Q Z ; do
 
   echo "Step 3: inverting some dimesions"
   ncpdq -O -a -latitude ${OUTFILE} ${OUTFILE}
+  RC=$?
+  if [[ "$RC" != "0" ]]; then
+    echo "Something went wrong while inverting latitude for ${field}. Exiting"
+    exit 1
+  fi
   if [[ "$DIM" == "3D" ]]; then
-    ncpdq -O -a -p ${OUTFILE} ${OUTFILE}
+    ncpdq -O -a -pint ${OUTFILE} ${OUTFILE}
+    RC=$?
+    if [[ "$RC" != "0" ]]; then
+      echo "Something went wrong while inverting pressure levels for ${field}. Exiting"
+      exit 1
+    fi
   fi
 
+  echo "Step 4: Change time dimension"
+  DAYS_DIFFERENCE=`calc_difference.py -o 1800-01-01 -n ${year}-${month}-01`
+  ncap2 -O -s "t=float((t/24.)-${DAYS_DIFFERENCE})" -s "t@units=\"days since ${year}-${month}-01 00:00\"" ${OUTFILE} ${OUTFILE}
+  RC=$?
+  if [[ "$RC" != "0" ]]; then
+    echo "Something went wrong. Exiting"
+    exit 1
+  fi
 
 
   echo "done"
