@@ -101,7 +101,7 @@ for field in U V T Q Z ; do
     # Adding height dimension to rename list
     DIMRENAMES="${DIMRENAMES} -d lv_ISBL1,p"
   fi
-  VARRENAMES="${DIMRENAMES//-d/-v}"
+  VARRENAMES="${DIMRENAMES//-d/-v} -v ${INVARNAME},${VARNAME}"
   ncrename -O ${DIMRENAMES} ${VARRENAMES} ${OUTFILE} ${OUTFILE}
   RC=$?
   if [[ "$RC" != "0" ]]; then
