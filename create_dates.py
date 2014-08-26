@@ -6,7 +6,7 @@ def export_dates_inp(start, n, dir):
   t = start
   delta_time=timedelta(hours=6)
 
-  dates = open(dir + '/dates.inp', 'w')
+  dates = open(dir + '/dates.dat', 'w')
 
   dates.write( t.strftime(' %Y%M%d %H\n') )
  
@@ -69,16 +69,18 @@ def export_base_inp(start, end, dir):
  ichgf=		.true.
  /
  &USRFIELDS_3
- namelist_template = '/short/dp9/glr548/genesis/run_genesis_era/cist-era/template.scm'
+ namelist_template = '/short/w35/hxw599/scm/data2/template.scm'
  /
  &TIME
  sdate={sdate:8},shour={shour:2},edate={edate:8},ehour={ehour:2},
- year=2014,month=01,day=01
+ year={syear:4},month=${smonth:2},day={sday:2}
  /
 """
   base=open(dir + '/base.inp', 'w')
   base.write( template.format(sdate=start.strftime('%Y%M%d'), shour=start.strftime('%H'),
-                        edate=end.strftime('%Y%M%d'), ehour=end.strftime('%H')) )
+                        edate=end.strftime('%Y%M%d'), ehour=end.strftime('%H'),
+                        syear=start.strftime('%Y'), smonth=start.strftime('%M'), 
+                        sday=start.strftime('%d') ))
   base.close()
 
 def main():
