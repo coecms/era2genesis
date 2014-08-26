@@ -3,6 +3,7 @@
 year="2000"
 month="01"
 day="01"
+num_timesteps=34
 
 # File name for u-component of wind will be ${file_prefix}_u.nc
 file_prefix="holger"
@@ -29,7 +30,7 @@ VFILE="${WORK_DIR}/${file_prefix}_v.nc"
 TFILE="${WORK_DIR}/${file_prefix}_temp.nc"
 ZFILE="${WORK_DIR}/${file_prefix}_ht.nc"
 QFILE="${WORK_DIR}/${file_prefix}_q.nc"
-MSPFILE="${WORK_DIR}/${file_prefix}_msp.nc"
+PFILE="${WORK_DIR}/${file_prefix}_msp.nc"
 
 FILES3D="${UFILE} ${VFILE} ${ZFILE} ${QFILE}"
 
@@ -62,8 +63,8 @@ for field in U V T Q Z ; do
       INVARNAME="Q_GDS0_ISBL"
       VARNAME="q"
       ;;
-    "MSP")
-      OUTFILE=${MSPFILE}
+    "P")
+      OUTFILE=${PILE}
       INVARNAME="MSL_GDS0_SFC"
       VARNAME="p"
       ;;
@@ -79,7 +80,7 @@ for field in U V T Q Z ; do
       TIMENAME="initial_time0_hours"
       DIM="3D"
       ;;
-    "MSP")
+    "P")
       LATNAME="g0_lat_1"
       LONNAME="g0_lon_2"
       TIMENAME="initial_time0_hours"
@@ -168,4 +169,16 @@ for field in U V T Q Z ; do
 
   echo "done"
 done
+
+echo "Creating files.inp"
+echo "${PFILE##*/}" > ${WORK_DIR}/files.inp
+echo "${ZFILE##*/}" >> ${WORK_DIR}/files.inp
+echo "${UFILE##*/}" >> ${WORK_DIR}/files.inp
+echo "${VFILE##*/}" >> ${WORK_DIR}/files.inp
+echo "${TFILE##*/}" >> ${WORK_DIR}/files.inp
+
+echo "Creating dates.inp and base.inp"
+create_dates.py -s ${year}-${month}-${day} -n ${num_timesteps} -d ${WORK_DIR}
+
+echo "Done, though you might want to check the base.inp file."
 
