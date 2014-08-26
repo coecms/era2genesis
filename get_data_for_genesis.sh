@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-year="2000"
+year="2014"
 month="01"
 day="01"
 num_timesteps=34
@@ -22,6 +22,7 @@ module load netcdf nco cdo python
 
 
 PATH_TO_ERA_FILES="/g/data1/ua8/erai/netcdf/oper_an_pl/fullres/sub-daily/${year}"
+PATH_TO_ERA_MSL="/g/data1/ua8/erai/netcdf/oper_an_sfc/fullres/sub-daily/${year}"
 WORK_DIR="/short/${PROJECT}/${USER}/scm/data2"
 
 
@@ -30,13 +31,12 @@ VFILE="${WORK_DIR}/${file_prefix}_v.nc"
 TFILE="${WORK_DIR}/${file_prefix}_temp.nc"
 ZFILE="${WORK_DIR}/${file_prefix}_ht.nc"
 QFILE="${WORK_DIR}/${file_prefix}_q.nc"
-PFILE="${WORK_DIR}/${file_prefix}_msp.nc"
+PFILE="${WORK_DIR}/${file_prefix}_p.nc"
 
 FILES3D="${UFILE} ${VFILE} ${ZFILE} ${QFILE}"
 
-for field in U V T Q Z ; do
+for field in U V T Q Z P; do
   echo "${field}... "
-  INFILE="${PATH_TO_ERA_FILES}/${field}_6hrs_pl_${year}_${month}.nc"
   case ${field} in
     "U")
       OUTFILE=${UFILE}
@@ -75,12 +75,14 @@ for field in U V T Q Z ; do
   esac
   case ${field} in 
     "U"|"V"|"T"|"Z"|"Q")
+      INFILE="${PATH_TO_ERA_FILES}/${field}_6hrs_pl_${year}_${month}.nc"
       LATNAME="g0_lat_2"
       LONNAME="g0_lon_3"
       TIMENAME="initial_time0_hours"
       DIM="3D"
       ;;
     "P")
+      INFILE="${PATH_TO_ERA_MSL}/MSL_6hrs_sfc_${year}_${month}.nc"
       LATNAME="g0_lat_1"
       LONNAME="g0_lon_2"
       TIMENAME="initial_time0_hours"
@@ -166,8 +168,25 @@ for field in U V T Q Z ; do
     exit 1
   fi
 
+  echo "Step 7: Making time the unlimited dimension"
+  ncks -O --mk_rec_dmn t ${OUTFILE} ${OUTFILE}
+
+  echo "Step 8: Shuffling the variables"
+
+  vars="longitude latitude"
+  if [[ "$DIM" == "3D" ]]; then
+    vars="$vars p"
+  fi
+  vars="$vars t ${VARNAME}"
+
+  for v in ${vars}; do
+    ncks -A -a -v ${v} ${OUTFILE} ${OUTFILE}.2.nc
+  done
+  mv ${OUTFILE} ${OUTFILE}.bak
+  mv ${OUTFILE}.2.nc ${OUTFILE}
 
   echo "done"
+
 done
 
 echo "Creating files.inp"
@@ -176,6 +195,7 @@ echo "${ZFILE##*/}" >> ${WORK_DIR}/files.inp
 echo "${UFILE##*/}" >> ${WORK_DIR}/files.inp
 echo "${VFILE##*/}" >> ${WORK_DIR}/files.inp
 echo "${TFILE##*/}" >> ${WORK_DIR}/files.inp
+echo -n "${QFILE##*/}" >> ${WORK_DIR}/files.inp
 
 echo "Creating dates.inp and base.inp"
 create_dates.py -s ${year}-${month}-${day} -n ${num_timesteps} -d ${WORK_DIR}
