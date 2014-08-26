@@ -16,7 +16,7 @@ LONRANGE="146.25,150.0"
 #Time 
 TIMERANGE="0,33"
 
-module load netcdf nco cdo
+module load netcdf nco cdo python
 
 
 PATH_TO_ERA_FILES="/g/data1/ua8/erai/netcdf/oper_an_pl/fullres/sub-daily/${year}"
