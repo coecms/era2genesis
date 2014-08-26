@@ -2,6 +2,7 @@
 
 year="2000"
 month="01"
+day="01"
 
 # File name for u-component of wind will be ${file_prefix}_u.nc
 file_prefix="holger"
@@ -126,8 +127,8 @@ for field in U V T Q Z ; do
   fi
 
   echo "Step 4: Change time dimension"
-  DAYS_DIFFERENCE=`calc_difference.py -o 1800-01-01 -n ${year}-${month}-01`
-  ncap2 -O -s "t=float((t/24.)-${DAYS_DIFFERENCE})" -s "t@units=\"days since ${year}-${month}-01 00:00\"" ${OUTFILE} ${OUTFILE}
+  DAYS_DIFFERENCE=`calc_difference.py -o 1800-01-01 -n ${year}-${month}-${day}`
+  ncap2 -O -s "t=float((t/24.)-${DAYS_DIFFERENCE})" -s "t@units=\"days since ${year}-${month}-${day} 00:00\"" ${OUTFILE} ${OUTFILE}
   RC=$?
   if [[ "$RC" != "0" ]]; then
     echo "Something went wrong. Exiting"
