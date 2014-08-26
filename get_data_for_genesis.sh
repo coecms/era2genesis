@@ -64,7 +64,7 @@ for field in U V T Q Z ; do
       VARNAME="q"
       ;;
     "P")
-      OUTFILE=${PILE}
+      OUTFILE=${PFILE}
       INVARNAME="MSL_GDS0_SFC"
       VARNAME="p"
       ;;
