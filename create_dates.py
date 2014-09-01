@@ -73,7 +73,7 @@ def export_base_inp(start, end, dir):
  /
  &TIME
  sdate={sdate:8},shour={shour:2},edate={edate:8},ehour={ehour:2},
- year={syear:4},month=${smonth:2},day={sday:2}
+ year={syear:4},month={smonth:2},day={sday:2}
  /
 """
   base=open(dir + '/base.inp', 'w')
