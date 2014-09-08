@@ -8,12 +8,12 @@ def export_dates_inp(start, n, dir):
 
   dates = open(dir + '/dates.dat', 'w')
 
-  dates.write( t.strftime(' %Y%M%d %H\n') )
+  dates.write( t.strftime(' %Y%M%d  %H\n') )
  
 
   for i in range(1,n):
     t += delta_time
-    dates.write( t.strftime(' %Y%M%d %H\n') )
+    dates.write( t.strftime(' %Y%M%d  %H\n') )
 
   dates.close()
 
