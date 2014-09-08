@@ -154,6 +154,11 @@ for field in U V T Q Z P; do
     fi
     ncrename -O -d pint,p ${OUTFILE} ${OUTFILE}
   fi
+  if [[ ${field} == "Z" ]]; then
+    ncap2 -O -s "${VARNAME}=${VARNAME}/9.81" ${OUTFILE} ${OUTFILE} ;
+    ncatted -O -a units,${VARNAME},o,c,"m" ${OUTFILE} ${OUTFILE} ;
+    ncatted -O -a long_name,${VARNAME},o,c,"height" ${OUTFILE} ${OUTFILE} ;
+  fi
 
   echo "Step 6: removing superfluous fields"
 
