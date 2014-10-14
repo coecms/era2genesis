@@ -15,7 +15,7 @@ LATRANGE="-37.5,-34.5"
 LONRANGE="146.25,150.0"
 
 
-#Time 
+# Time 
 TIMERANGE="0,33"
 
 module load netcdf nco cdo python
