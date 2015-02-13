@@ -8,12 +8,12 @@ def export_dates_inp(start, n, dir):
 
   dates = open(dir + '/dates.dat', 'w')
 
-  dates.write( t.strftime(' %Y%M%d  %H\n') )
+  dates.write( t.strftime(' %Y%m%d  %H\n') )
  
 
   for i in range(1,n):
     t += delta_time
-    dates.write( t.strftime(' %Y%M%d  %H\n') )
+    dates.write( t.strftime(' %Y%m%d  %H\n') )
 
   dates.close()
 
@@ -77,9 +77,9 @@ def export_base_inp(start, end, dir):
  /
 """
   base=open(dir + '/base.inp', 'w')
-  base.write( template.format(sdate=start.strftime('%Y%M%d'), shour=start.strftime('%H'),
-                        edate=end.strftime('%Y%M%d'), ehour=end.strftime('%H'),
-                        syear=start.strftime('%Y'), smonth=start.strftime('%M'), 
+  base.write( template.format(sdate=start.strftime('%Y%m%d'), shour=start.strftime('%H'),
+                        edate=end.strftime('%Y%m%d'), ehour=end.strftime('%H'),
+                        syear=start.strftime('%Y'), smonth=start.strftime('%m'), 
                         sday=start.strftime('%d') ))
   base.close()
 
@@ -90,7 +90,7 @@ def main():
   parser.add_option('-d', '--dir', help="Work Directory")
   (opts, args) = parser.parse_args()
 
-  start_time=datetime.strptime(opts.start, '%Y-%M-%d')
+  start_time=datetime.strptime(opts.start, '%Y-%m-%d')
   end_time = export_dates_inp(start_time, int(opts.number), opts.dir)
   export_base_inp(start_time, end_time, opts.dir)
 
