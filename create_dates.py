@@ -154,13 +154,16 @@ def main():
   parser.add_option('-s', '--start', help="Start date")
   parser.add_option('-n', '--number', help="Number of dates")
   parser.add_option('-d', '--dir', help="Work Directory")
+  parser.add_option('--test', help="Unit Test this script", action="store_true", default=False)
   (opts, args) = parser.parse_args()
 
-  start_time=datetime.strptime(opts.start, '%Y-%m-%d')
-  end_time = export_dates_inp(start_time, int(opts.number), opts.dir)
-  export_base_inp(start_time, end_time, opts.dir)
+  if opts.test:
+    import doctest
+    doctest.testmod()
+  else:
+    start_time=datetime.strptime(opts.start, '%Y-%m-%d')
+    end_time = export_dates_inp(start_time, int(opts.number), opts.dir)
+    export_base_inp(start_time, end_time, opts.dir)
 
 if __name__ == '__main__':
-#  import doctest
-#  doctest.testmod()
   main()
