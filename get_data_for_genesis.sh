@@ -94,7 +94,8 @@ for field in U V T Q Z P; do
   ncks -d ${LATNAME},${LATRANGE} -d ${LONNAME},${LONRANGE} -d ${TIMENAME},${TIMERANGE} ${INFILE} ${OUTFILE}
   RC=$?
   if [[ "$RC" != "0" ]]; then
-    echo "Something went wrong. Exiting"
+    echo "Something went wrong with the following command: Exiting"
+    echo ncks -d ${LATNAME},${LATRANGE} -d ${LONNAME},${LONRANGE} -d ${TIMENAME},${TIMERANGE} ${INFILE} ${OUTFILE}
     exit 1
   fi
 
