@@ -1,23 +1,89 @@
 #!/usr/bin/env python
 from datetime import datetime,timedelta
 from optparse import OptionParser
+import copy
+
+def create_dates(start, n):
+  """(datetime, int) -> list of str
+
+  Creates a list of strings of the form "20040201  00" (YYYYMMDD  HH)
+  of 6 hour intervals beginning with start time start, and having n 
+  elements.
+
+  >>> start = datetime(2004, 02, 25, 00)
+  >>> result = create_dates( start, 10 )
+  >>> for s in result: print "|"+s+"|"
+  | 20040225  00|
+  | 20040225  06|
+  | 20040225  12|
+  | 20040225  18|
+  | 20040226  00|
+  | 20040226  06|
+  | 20040226  12|
+  | 20040226  18|
+  | 20040227  00|
+  | 20040227  06|
+
+  >>> start = datetime(2004, 02, 28, 00)
+  >>> result = create_dates( start, 10 )
+  >>> for s in result: print "|"+s+"|"
+  | 20040228  00|
+  | 20040228  06|
+  | 20040228  12|
+  | 20040228  18|
+  | 20040229  00|
+  | 20040229  06|
+  | 20040229  12|
+  | 20040229  18|
+  | 20040301  00|
+  | 20040301  06|
+
+  >>> start = datetime(2004, 02, 28, 12)
+  >>> result = create_dates( start, 8 )
+  >>> for s in result: print "|"+s+"|"
+  | 20040228  12|
+  | 20040228  18|
+  | 20040229  00|
+  | 20040229  06|
+  | 20040229  12|
+  | 20040229  18|
+  | 20040301  00|
+  | 20040301  06|
+  """
+
+  dt = timedelta(hours=6)
+
+  return_list = []
+
+  t = copy.deepcopy(start)
+
+  for i in range(n):
+    return_list.append(t.strftime( ' %Y%m%d  %H' ))
+    t += dt
+
+  return return_list
 
 def export_dates_inp(start, n, dir):
-  t = start
-  delta_time=timedelta(hours=6)
+  """(datetime, int, str) -> datetime
 
-  dates = open(dir + '/dates.dat', 'w')
+  Writes the dates.dat file, and returns a datetime of the last element of that file
 
-  dates.write( t.strftime(' %Y%m%d  %H\n') )
- 
+  >>> import os
+  >>> os.system("test -d ./delme || mkdir ./delme")
+  0
+  >>> start = datetime(2004, 02, 28, 12)
+  >>> export_dates_inp( start, 8, './delme' )
+  datetime.datetime(2004, 3, 1, 6, 0)
+  """
 
-  for i in range(1,n):
-    t += delta_time
-    dates.write( t.strftime(' %Y%m%d  %H\n') )
+  dates = create_dates(start, n)
 
-  dates.close()
+  with open(dir + '/dates.dat', 'w') as datefile:
+    for item in dates:
+      datefile.write(item + '\n')
+  datefile.close()
 
-  return t
+  return start + timedelta(hours = 6 * (n-1))
 
 
 def export_base_inp(start, end, dir):
@@ -95,4 +161,6 @@ def main():
   export_base_inp(start_time, end_time, opts.dir)
 
 if __name__ == '__main__':
+#  import doctest
+#  doctest.testmod()
   main()
